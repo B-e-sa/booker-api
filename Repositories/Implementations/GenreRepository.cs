@@ -1,4 +1,4 @@
-using Booker.Interfaces;
+using Booker.Repositories.Models;
 
 namespace Booker.Repositories.Implementations
 {

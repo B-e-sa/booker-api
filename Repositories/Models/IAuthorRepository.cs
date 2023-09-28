@@ -1,4 +1,4 @@
-namespace Booker.Interfaces
+namespace Booker.Repositories.Models
 {
     public interface IAuthorRepository
     {

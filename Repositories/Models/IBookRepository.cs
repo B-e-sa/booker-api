@@ -1,6 +1,6 @@
 using Booker.Models;
 
-namespace Booker.Interfaces
+namespace Booker.Repositories.Models
 {
     public interface IBookRepository
     {

@@ -1,6 +1,6 @@
 using Booker.Data;
-using Booker.Interfaces;
 using Booker.Models;
+using Booker.Repositories.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Booker.Repositories.Implementations
