@@ -25,7 +25,7 @@ namespace Booker.Repositories.Implementations
 
         public async Task<Book> Update(string id)
         {
-            Book bookToUpdate = await this.FindById(id);
+            Book? bookToUpdate = await FindById(id);
 
             _dbContext.Books.Update(bookToUpdate);
 
@@ -34,7 +34,7 @@ namespace Booker.Repositories.Implementations
 
         public async Task<Book> Delete(string id)
         {
-            Book bookToDelete = await this.FindById(id);
+            Book? bookToDelete = await FindById(id);
 
             _dbContext.Books.Remove(bookToDelete);
 
