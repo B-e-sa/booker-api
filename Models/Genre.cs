@@ -2,7 +2,7 @@ namespace Booker.Models
 {
     public class Genre
     {
-        public string? Id { get; }
+        public Guid? Id { get; set; }
         public string? Name { get; set; }
     }
 }
