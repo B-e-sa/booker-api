@@ -5,7 +5,7 @@ namespace Booker.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    class Publisher : ControllerBase
+    class PublisherController : ControllerBase
     {
         
     }
