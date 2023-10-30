@@ -1,6 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace Booker.Models
 {
@@ -12,11 +10,13 @@ namespace Booker.Models
 
         public Guid? PublisherId { get; set; }
 
+        [Required]
         [StringLength(30)]
-        public string? Title { get; set; }
+        public string Title = "Unknown";
 
         public string? Description { get; set; }
 
+        [Required]
         [StringLength(13)]
         public string? ISBN { get; set; }
 
