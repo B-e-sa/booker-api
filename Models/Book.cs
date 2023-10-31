@@ -1,7 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace Booker.Models
 {
+    [Index(nameof(ISBN), IsUnique = true)]
     public class Book
     {
         public Guid? Id { get; set; }
@@ -12,13 +14,16 @@ namespace Booker.Models
 
         [Required]
         [StringLength(30)]
-        public string Title = "Unknown";
+        public string? Title;
 
         public string? Description { get; set; }
 
         [Required]
-        [StringLength(13)]
-        public string? ISBN { get; set; }
+        [RegularExpression(
+            @"^\d{3}-\d-\d{2}-\d{6}-\d$",
+            ErrorMessage = "Invalid ISBN format"
+        )]
+        public string? ISBN  { get; set; }
 
         public Author? Author { get; set; }
 

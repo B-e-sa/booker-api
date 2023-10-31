@@ -1,5 +1,4 @@
 using Booker.Models;
-using Booker.Repositories.Implementations;
 using Booker.Repositories.Models;
 using Booker.Services.Models;
 
@@ -15,10 +14,11 @@ namespace Booker.Services.Implementations
 
         public async Task<Book> Add(Book book) => await _bookRepository.Add(book);
 
-        public async Task<List<Book>> FindAll() => await _bookRepository.FindAll();
+        public async Task<List<Book>> FindAll(int limit, int offset) =>
+            await _bookRepository.FindAll(limit, offset);
 
-        public async Task<Book> Update(Guid id) => await _bookRepository.Update(id);
+        public async Task<Book?> Update(Guid id) => await _bookRepository.Update(id);
 
-        public async Task<Book> Delete(Guid id) => await _bookRepository.Delete(id);
+        public async Task<Book?> Delete(Guid id) => await _bookRepository.Delete(id);
     }
 }

@@ -1,6 +1,7 @@
 using Booker.Models;
 using Booker.Services.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Booker.Controllers
 {
@@ -13,14 +14,25 @@ namespace Booker.Controllers
         public BookController(IBookService bookService) => _bookService = bookService;
 
         [HttpGet]
-        public async Task<IActionResult> FindAll()
+        public async Task<IActionResult> FindAll(
+            [FromQuery] int limit = 30,
+            [FromQuery] int offset = 0
+        )
         {
-            List<Book> books = await _bookService.FindAll();
+            if (limit <= 0 || offset < 0)
+                return BadRequest(new { message = "Invalid result limit or page number" });
 
-            if (!books.Any())
-                return Ok(new { message = "There are any books yet, add some!" });
+            int correctOffset = offset > 0 ? offset - 1 : 0;
 
-            return Ok(books);
+            List<Book> books = await _bookService.FindAll(limit, correctOffset);
+
+            return Ok(
+                new
+                {
+                    books,
+                    page = correctOffset,
+                    limit,
+                });
         }
 
         [HttpGet("{id}")]
@@ -35,19 +47,13 @@ namespace Booker.Controllers
 
                 Book? foundBook = await _bookService.FindById(stringToGuid);
 
-                if (foundBook is null)
-                    return NotFound(new { message = "Resource not found" });
+                if (foundBook is null) return NotFound();
 
                 return Ok(foundBook);
             }
-            catch (FormatException err)
+            catch (FormatException)
             {
-                return BadRequest(
-                    new
-                    {
-                        message = "The given id was not valid",
-                        error = err.Message
-                    });
+                return BadRequest(new { message = "The given id was not valid" });
             }
         }
 
@@ -77,14 +83,38 @@ namespace Booker.Controllers
 
             try
             {
+                // TODO: IMPLEMENT AUTO BOOK NAMER
                 createdBook = await _bookService.Add(book);
-
                 return Created(nameof(book), createdBook);
             }
-            catch (Exception error)
+            catch (DbUpdateException ex)
             {
-                Console.WriteLine(error);
-                return BadRequest(error);
+                return BadRequest(
+                    new
+                    {
+                        message = "Book ISBN already exists ",
+                        error = ex.Message,
+                    });
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(string id)
+        {
+            try
+            {
+                Guid stringToGuid = Guid.Parse(id);
+
+                Book? deletedBook = await _bookService.Delete(stringToGuid);
+
+                if (deletedBook is null)
+                    return NotFound(new { message = "Id not found" });
+
+                return Ok(deletedBook);
+            }
+            catch (FormatException)
+            {
+                return BadRequest(new { message = "The given id was not valid" });
             }
         }
     }

@@ -9,34 +9,43 @@ namespace Booker.Repositories.Implementations
     {
         private readonly BookerDbContext _dbContext;
 
-        public BookRepository(BookerDbContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
+        // TODO: APPLY SHORTHAND
+        public BookRepository(BookerDbContext dbContext) => _dbContext = dbContext;
 
         public async Task<Book?> FindById(Guid id) => await _dbContext.Books.FindAsync(id);
 
-        public async Task<List<Book>> FindAll() => await _dbContext.Books.ToListAsync();
+        public async Task<List<Book>> FindAll(int limit, int offset)
+        {
+            return await _dbContext.Books
+                .Select(book => book)
+                .Skip(offset)
+                .Take(limit)
+                .ToListAsync();
+        }
+
         public async Task<Book> Add(Book book)
         {
             await _dbContext.Books.AddAsync(book);
+            await _dbContext.SaveChangesAsync();
             return book;
         }
 
-        public async Task<Book> Update(Guid id)
+        public async Task<Book?> Update(Guid id)
         {
             Book? bookToUpdate = await FindById(id);
 
-            _dbContext.Books.Update(bookToUpdate);
+            if (bookToUpdate is not null)
+                _dbContext.Books.Update(bookToUpdate);
 
             return bookToUpdate;
         }
 
-        public async Task<Book> Delete(Guid id)
+        public async Task<Book?> Delete(Guid id)
         {
             Book? bookToDelete = await FindById(id);
 
-            _dbContext.Books.Remove(bookToDelete);
+            if (bookToDelete is not null)
+                _dbContext.Books.Remove(bookToDelete);
 
             return bookToDelete;
         }
