@@ -1,6 +1,9 @@
+using Booker.Controllers;
 using Booker.Data;
 using Booker.Repositories.Implementations;
 using Booker.Repositories.Models;
+using Booker.Services.Implementations;
+using Booker.Services.Models;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,10 +13,17 @@ service.AddControllers();
 service.AddEndpointsApiExplorer();
 service.AddSwaggerGen();
 
-service.AddSingleton<IBookRepository, BookRepository>();
-service.AddSingleton<IAuthorRepository, AuthorRepository>();
-service.AddSingleton<IPublisherRepository, PublisherRepository>();
-service.AddSingleton<IGenreRepository, GenreRepository>();
+// SERVICES
+service.AddScoped<IAuthorService, AuthorService>();
+service.AddScoped<IBookService, BookService>();
+service.AddScoped<IPublisherService, PublisherService>();
+service.AddScoped<IGenreService, GenreService>();
+
+// REPOSITORIES
+service.AddScoped<IBookRepository, BookRepository>();
+service.AddScoped<IAuthorRepository, AuthorRepository>();
+service.AddScoped<IPublisherRepository, PublisherRepository>();
+service.AddScoped<IGenreRepository, GenreRepository>();
 
 service.AddDbContext<BookerDbContext>(options =>
 {
@@ -24,9 +34,16 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
+    app.UseDeveloperExceptionPage();
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors(builder => builder
+    .AllowAnyOrigin()
+    .AllowAnyMethod()
+    .AllowAnyHeader()
+);
 
 app.UseHttpsRedirection();
 
