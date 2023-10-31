@@ -14,7 +14,7 @@ namespace Booker.Repositories.Implementations
             _dbContext = dbContext;
         }
 
-        public async Task<Book?> FindById(string id) => await _dbContext.Books.FindAsync(id);
+        public async Task<Book?> FindById(Guid id) => await _dbContext.Books.FindAsync(id);
 
         public async Task<List<Book>> FindAll() => await _dbContext.Books.ToListAsync();
         public async Task<Book> Add(Book book)
@@ -23,7 +23,7 @@ namespace Booker.Repositories.Implementations
             return book;
         }
 
-        public async Task<Book> Update(string id)
+        public async Task<Book> Update(Guid id)
         {
             Book? bookToUpdate = await FindById(id);
 
@@ -32,7 +32,7 @@ namespace Booker.Repositories.Implementations
             return bookToUpdate;
         }
 
-        public async Task<Book> Delete(string id)
+        public async Task<Book> Delete(Guid id)
         {
             Book? bookToDelete = await FindById(id);
 
