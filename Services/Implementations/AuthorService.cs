@@ -17,8 +17,8 @@ namespace Booker.Services.Implementations
         public async Task<List<Author>> FindAll(int limit, int offset) =>
             await _authorRepository.FindAll(limit, offset);
 
-        public async Task<Author?> Update(Guid id) => await _authorRepository.Update(id);
+        public async Task<Author> Update(Author author) => await _authorRepository.Update(author);
 
-        public async Task<Author?> Delete(Guid id) => await _authorRepository.Delete(id);
+        public async Task<Author> Delete(Author author) => await _authorRepository.Delete(author);
     }
 }

@@ -7,7 +7,7 @@ namespace Booker.Services.Models
         Task<Genre> Add(Genre genre);
         Task<Genre?> FindById(Guid id);
         Task<List<Genre>> FindAll(int limit, int offset);
-        Task<Genre?> Update(Guid id);
+        Task<Genre?> Update(Genre genre);
         Task<Genre?> Delete(Guid id);
     }
 }

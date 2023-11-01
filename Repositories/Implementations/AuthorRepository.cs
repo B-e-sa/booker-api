@@ -15,17 +15,16 @@ namespace Booker.Repositories.Implementations
         {
             await _dbContext.Authors.AddAsync(author);
             await _dbContext.SaveChangesAsync();
+
             return author;
         }
 
-        public async Task<Author?> Delete(Guid id)
+        public async Task<Author> Delete(Author author)
         {
-            Author? authorToDelete = await FindById(id);
+            _dbContext.Authors.Remove(author);
+            await _dbContext.SaveChangesAsync();
 
-            if (authorToDelete is not null)
-                _dbContext.Authors.Remove(authorToDelete);
-
-            return authorToDelete;
+            return author;
         }
 
         public async Task<List<Author>> FindAll(int limit, int offset)
@@ -39,14 +38,12 @@ namespace Booker.Repositories.Implementations
 
         public async Task<Author?> FindById(Guid id) => await _dbContext.Authors.FindAsync(id);
 
-        public async Task<Author?> Update(Guid id)
+        public async Task<Author> Update(Author author)
         {
-            Author? authorToUpdate = await FindById(id);
+            _dbContext.Authors.Update(author);
+            await _dbContext.SaveChangesAsync();
 
-            if (authorToUpdate is not null)
-                _dbContext.Authors.Update(authorToUpdate);
-
-            return authorToUpdate;
+            return author;
         }
     }
 }

@@ -1,7 +1,6 @@
 using Booker.Models;
 using Booker.Services.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Booker.Controllers
 {
@@ -66,13 +65,17 @@ namespace Booker.Controllers
                 });
         }
 
-        /*
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(Guid id)
         {
+            Author? authorToUpdate = await _authorService.FindById(id);
 
+            if (authorToUpdate is null) return NotFound();
+
+            Author updatedAuthor = await _authorService.Update(authorToUpdate);
+
+            return Ok(updatedAuthor);
         }
-        */
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
@@ -81,9 +84,11 @@ namespace Booker.Controllers
             {
                 Guid stringToGuid = Guid.Parse(id);
 
-                Author? deletedAuthor = await _authorService.Delete(stringToGuid);
+                Author? authorToDelete = await _authorService.FindById(stringToGuid);
 
-                if (deletedAuthor is null) return NotFound();
+                if (authorToDelete is null) return NotFound();
+
+                Author? deletedAuthor = await _authorService.Delete(authorToDelete);
 
                 return Ok(deletedAuthor);
             }

@@ -27,27 +27,24 @@ namespace Booker.Repositories.Implementations
         {
             await _dbContext.Books.AddAsync(book);
             await _dbContext.SaveChangesAsync();
+
             return book;
         }
 
-        public async Task<Book?> Update(Guid id)
+        public async Task<Book> Update(Book book)
         {
-            Book? bookToUpdate = await FindById(id);
+            _dbContext.Books.Update(book);
+            await _dbContext.SaveChangesAsync();
 
-            if (bookToUpdate is not null)
-                _dbContext.Books.Update(bookToUpdate);
-
-            return bookToUpdate;
+            return book;
         }
 
-        public async Task<Book?> Delete(Guid id)
+        public async Task<Book> Delete(Book book)
         {
-            Book? bookToDelete = await FindById(id);
+            _dbContext.Books.Remove(book);
+            await _dbContext.SaveChangesAsync();
 
-            if (bookToDelete is not null)
-                _dbContext.Books.Remove(bookToDelete);
-
-            return bookToDelete;
+            return book;
         }
     }
 }

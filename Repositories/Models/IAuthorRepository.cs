@@ -7,7 +7,7 @@ namespace Booker.Repositories.Models
         Task<Author> Add(Author author);
         Task<Author?> FindById(Guid id);
         Task<List<Author>> FindAll(int limit, int offset);
-        Task<Author?> Update(Guid id);
-        Task<Author?> Delete(Guid id);
+        Task<Author> Update(Author author);
+        Task<Author> Delete(Author author);
     }
 }

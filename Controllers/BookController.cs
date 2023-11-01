@@ -10,8 +10,19 @@ namespace Booker.Controllers
     public class BookController : ControllerBase
     {
         private readonly IBookService _bookService;
+        private readonly IGenreService _genreService;
+        private readonly IAuthorService _authorService;
 
-        public BookController(IBookService bookService) => _bookService = bookService;
+        public BookController(
+            IBookService bookService,
+            IGenreService genreService,
+            IAuthorService authorService
+        )
+        {
+            _bookService = bookService;
+            _genreService = genreService;
+            _authorService = authorService;
+        }
 
         [HttpGet]
         public async Task<IActionResult> FindAll(
@@ -116,6 +127,23 @@ namespace Booker.Controllers
             {
                 return BadRequest(new { message = "The given id was not valid" });
             }
+        }
+
+        [HttpPut("associations/{bookId}/genre/{genreId}")]
+        public async Task<IActionResult> AssociateGenre([FromForm] Guid bookId, [FromForm] Guid genreId)
+        {
+            Genre? genreToRelate = await _genreService.FindById(genreId);
+
+            if (genreToRelate is null)
+                return NotFound(new { message = "Genre not found" });
+
+            await
+        }
+
+        [HttpPut("associations/author")]
+        public async Task<IActionResult> AssociateAuthor()
+        {
+
         }
     }
 }
