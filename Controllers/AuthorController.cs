@@ -16,23 +16,8 @@ namespace Booker.Controllers
         [HttpPost]
         public async Task<IActionResult> Add(Author author)
         {
-            Author? createdAuthor;
-
-            try
-            {
-                // TODO: IMPLEMENT AUTO BOOK NAMER
-                createdAuthor = await _authorService.Add(author);
-                return Created(nameof(author), createdAuthor);
-            }
-            catch (DbUpdateException ex)
-            {
-                return BadRequest(
-                    new
-                    {
-                        message = "Book ISBN already exists ",
-                        error = ex.Message,
-                    });
-            }
+            Author createdAuthor = await _authorService.Add(author);
+            return Created(nameof(author), createdAuthor);
         }
 
         [HttpGet("{id}")]

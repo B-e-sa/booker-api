@@ -7,7 +7,7 @@ namespace Booker.Repositories.Implementations
 {
     public class AuthorRepository : IAuthorRepository
     {
-         private readonly BookerDbContext _dbContext;
+        private readonly BookerDbContext _dbContext;
 
         public AuthorRepository(BookerDbContext dbContext) => _dbContext = dbContext;
 
@@ -37,10 +37,7 @@ namespace Booker.Repositories.Implementations
                  .ToListAsync();
         }
 
-        public Task<Author?> FindById(Guid id)
-        {
-            throw new NotImplementedException();
-        }
+        public async Task<Author?> FindById(Guid id) => await _dbContext.Authors.FindAsync(id);
 
         public async Task<Author?> Update(Guid id)
         {
