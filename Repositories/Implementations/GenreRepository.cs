@@ -26,29 +26,28 @@ namespace Booker.Repositories.Implementations
         public async Task<Genre> Add(Genre genre)
         {
             await _dbContext.Genres.AddAsync(genre);
+
             await _dbContext.SaveChangesAsync();
+
             return genre;
         }
 
-        public async Task<Genre?> Update(Guid id)
+        public async Task<Genre> Update(Genre genreToUpdate)
         {
-            Genre? genreToUpdate = await FindById(id);
+            _dbContext.Genres.Update(genreToUpdate);
 
-            if (genreToUpdate is not null)
-                _dbContext.Genres.Update(genreToUpdate);
+            await _dbContext.SaveChangesAsync();
 
             return genreToUpdate;
         }
 
-        public async Task<Genre?> Delete(Guid id)
+        public async Task<Genre> Delete(Genre genreToDelete)
         {
-            Genre? genreToDelete = await FindById(id);
+            _dbContext.Genres.Remove(genreToDelete);
 
-            if (genreToDelete is not null)
-                _dbContext.Genres.Remove(genreToDelete);
+            await _dbContext.SaveChangesAsync();
 
             return genreToDelete;
         }
-
     }
 }
