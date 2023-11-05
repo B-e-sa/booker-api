@@ -23,7 +23,7 @@ namespace Booker.Controllers
         public async Task<IActionResult> FindById(string id)
         {
             if (string.IsNullOrEmpty(id))
-                return BadRequest(new { message = "Invalid id" });
+                return BadRequest(new { title = "Invalid id" });
 
             try
             {
@@ -40,7 +40,7 @@ namespace Booker.Controllers
                 return BadRequest(
                     new
                     {
-                        message = "The given id was not valid",
+                        title = "The given id was not valid",
                         error = ex.Message
                     });
             }
@@ -50,7 +50,7 @@ namespace Booker.Controllers
         public async Task<IActionResult> FindAll([FromQuery] int limit = 30, [FromQuery] int offset = 0)
         {
             if (limit <= 0 || offset < 0)
-                return BadRequest(new { message = "Invalid result limit or page number" });
+                return BadRequest(new { title = "Invalid result limit or page number" });
 
             int correctOffset = offset > 0 ? offset - 1 : 0;
 
@@ -97,7 +97,7 @@ namespace Booker.Controllers
                 return BadRequest(
                     new
                     {
-                        message = "The given id was not valid",
+                        title = "The given id was not valid",
                         error = ex.Message
                     });
             }
