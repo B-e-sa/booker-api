@@ -9,25 +9,19 @@ namespace Booker.Repositories.Implementations
     {
         private readonly BookerDbContext _dbContext;
 
-        // TODO: APPLY SHORTHAND
-        public BookRepository(BookerDbContext dbContext) => _dbContext = dbContext;
+        public BookRepository(BookerDbContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
 
         public async Task<Book?> FindById(Guid id) => await _dbContext.Books.FindAsync(id);
 
-        public async Task<List<Book>> FindAll(int limit, int offset)
-        {
-            return await _dbContext.Books
-                .Select(book => book)
-                .Skip(offset)
-                .Take(limit)
-                .ToListAsync();
-        }
+        public async Task<List<Book>> FindAll(int limit, int offset) => await _dbContext.Books.ToListAsync();
 
         public async Task<Book> Add(Book book)
         {
-            await _dbContext.Books.AddAsync(book);
+            _dbContext.Books.Add(book);
             await _dbContext.SaveChangesAsync();
-
             return book;
         }
 
@@ -35,7 +29,6 @@ namespace Booker.Repositories.Implementations
         {
             _dbContext.Books.Update(book);
             await _dbContext.SaveChangesAsync();
-
             return book;
         }
 
@@ -43,7 +36,6 @@ namespace Booker.Repositories.Implementations
         {
             _dbContext.Books.Remove(book);
             await _dbContext.SaveChangesAsync();
-
             return book;
         }
     }
