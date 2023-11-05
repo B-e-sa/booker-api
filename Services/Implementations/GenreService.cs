@@ -17,9 +17,8 @@ namespace Booker.Services.Implementations
         public async Task<List<Genre>> FindAll(int limit, int offset) =>
             await _genreRepository.FindAll(limit, offset);
 
-        public async Task<Genre?> Update(Guid id) => await _genreRepository.Update(id);
+        public async Task<Genre> Update(Genre genre) => await _genreRepository.Update(genre);
 
-        public async Task<Genre?> Delete(Guid id) => await _genreRepository.Delete(id);
-
+        public async Task<Genre> Delete(Genre genre) => await _genreRepository.Delete(genre);
     }
 }
