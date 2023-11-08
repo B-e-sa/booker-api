@@ -1,5 +1,5 @@
 using Booker.Models;
-using Booker.Services.Models;
+using Booker.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Booker.Controllers
@@ -8,12 +8,23 @@ namespace Booker.Controllers
     [ApiController]
     public class AuthorController : ControllerBase
     {
-        private readonly IAuthorService _authorService;
+        private readonly AuthorService _authorService;
+        private readonly GenreService _genreService;
+        private readonly BookService _bookService;
 
-        public AuthorController(IAuthorService authorService) => _authorService = authorService;
+        public AuthorController(
+            AuthorService authorService,
+            GenreService genreService,
+            BookService bookService
+        )
+        {
+            _authorService = authorService;
+            _genreService = genreService;
+            _bookService = bookService;
+        }
 
         [HttpPost]
-        public async Task<IActionResult> Add(Author author)
+        public async Task<IActionResult> Add([FromForm] Author author)
         {
             Author createdAuthor = await _authorService.Add(author);
             return Created(nameof(author), createdAuthor);
@@ -41,13 +52,16 @@ namespace Booker.Controllers
                     new
                     {
                         title = "The given id was not valid",
-                        error = ex.Message
+                        errors = ex.Message
                     });
             }
         }
 
         [HttpGet]
-        public async Task<IActionResult> FindAll([FromQuery] int limit = 30, [FromQuery] int offset = 0)
+        public async Task<IActionResult> FindAll(
+            [FromQuery] int limit = 30,
+            [FromQuery] int offset = 0
+        )
         {
             if (limit <= 0 || offset < 0)
                 return BadRequest(new { title = "Invalid result limit or page number" });
@@ -101,6 +115,55 @@ namespace Booker.Controllers
                         error = ex.Message
                     });
             }
+        }
+
+        [HttpPut("associations/{authorId}/genre/{genreId}")]
+        public async Task<IActionResult> AssociateGenre(
+            [FromForm] Guid authorId,
+            [FromForm] Guid genreId
+        )
+        {
+            Author? authorToRelate = await _authorService.FindById(genreId);
+
+            if (authorToRelate is null)
+                return NotFound(new { title = "Author not found" });
+
+            Genre? genreToRelate = await _genreService.FindById(authorId);
+
+            if (genreToRelate is null)
+                return NotFound(new { title = "Genre not found" });
+
+            if (authorToRelate.Genres is null)
+                authorToRelate.Genres = new List<Genre> { genreToRelate };
+
+            authorToRelate.Genres.Add(genreToRelate);
+
+            await _authorService.Update(authorToRelate);
+
+            return Ok(authorToRelate);
+        }
+
+        [HttpPut("associations/{authorId}/book/{bookId}")]
+        public async Task<IActionResult> AssociateBook(
+            [FromForm] Guid authorId,
+            [FromForm] Guid bookId
+        )
+        {
+            Author? authorToRelate = await _authorService.FindById(authorId);
+
+            if (authorToRelate is null)
+                return NotFound(new { title = "Author not found" });
+
+            Book? bookToRelate = await _bookService.FindById(bookId);
+
+            if (bookToRelate is null)
+                return NotFound(new { title = "Book not found" });
+
+            bookToRelate.Author = authorToRelate;
+
+            await _bookService.Update(bookToRelate);
+
+            return Ok(bookToRelate);
         }
     }
 }

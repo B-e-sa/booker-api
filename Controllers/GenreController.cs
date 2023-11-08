@@ -1,7 +1,6 @@
 using Booker.Models;
-using Booker.Services.Models;
+using Booker.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Booker.Controllers
 {
@@ -9,17 +8,17 @@ namespace Booker.Controllers
     [ApiController]
     class GenreController : ControllerBase
     {
-        private readonly IGenreService _genreService;
+        private readonly GenreService _genreService;
 
-        public GenreController(IGenreService genreService) => _genreService = genreService;
+        public GenreController(GenreService genreService) => _genreService = genreService;
 
         public async Task<IActionResult> FindAll(
             [FromQuery] int limit = 30,
             [FromQuery] int offset = 0
         )
         {
-            if (limit <= 0 || offset < 0)
-                return BadRequest(new { message = "Invalid result limit or page number" });
+            if (limit <= 0 || offset <= 0)
+                return BadRequest(new { title = "Invalid result limit or page number" });
 
             int correctOffset = offset > 0 ? offset - 1 : 0;
 
@@ -38,7 +37,7 @@ namespace Booker.Controllers
         public async Task<IActionResult> FindById(string id)
         {
             if (string.IsNullOrEmpty(id))
-                return BadRequest(new { message = "Invalid id" });
+                return BadRequest(new { title = "Invalid id" });
 
             try
             {
@@ -52,7 +51,7 @@ namespace Booker.Controllers
             }
             catch (FormatException)
             {
-                return BadRequest(new { message = "The given id was not valid" });
+                return BadRequest(new { title = "The given id was not valid" });
             }
         }
 
@@ -90,16 +89,17 @@ namespace Booker.Controllers
             {
                 Guid stringToGuid = Guid.Parse(id);
 
-                Genre? deletedGenre = await _genreService.Delete(stringToGuid);
+                Genre? genreToDelete = await _genreService.FindById(stringToGuid);
 
-                if (deletedGenre is null)
-                    return NotFound(new { message = "Id not found" });
+                if (genreToDelete is null) return NotFound();
+
+                Genre deletedGenre = await _genreService.Delete(genreToDelete);
 
                 return Ok(deletedGenre);
             }
             catch (FormatException)
             {
-                return BadRequest(new { message = "The given id was not valid" });
+                return BadRequest(new { title = "The given id was not valid" });
             }
         }
     }

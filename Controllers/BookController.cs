@@ -1,7 +1,6 @@
 using Booker.Models;
-using Booker.Services.Models;
+using Booker.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Booker.Controllers
 {
@@ -9,19 +8,22 @@ namespace Booker.Controllers
     [ApiController]
     public class BookController : ControllerBase
     {
-        private readonly IBookService _bookService;
-        private readonly IGenreService _genreService;
-        private readonly IAuthorService _authorService;
+        private readonly BookService _bookService;
+        private readonly GenreService _genreService;
+        private readonly AuthorService _authorService;
+        private readonly PublisherService _publisherService;
 
         public BookController(
-            IBookService bookService,
-            IGenreService genreService,
-            IAuthorService authorService
+            BookService bookService,
+            GenreService genreService,
+            AuthorService authorService,
+            PublisherService publisherService
         )
         {
             _bookService = bookService;
             _genreService = genreService;
             _authorService = authorService;
+            _publisherService = publisherService;
         }
 
         [HttpGet]
@@ -31,7 +33,7 @@ namespace Booker.Controllers
         )
         {
             if (limit <= 0 || offset < 0)
-                return BadRequest(new { message = "Invalid result limit or page number" });
+                return BadRequest(new { title = "Invalid result limit or page number" });
 
             int correctOffset = offset > 0 ? offset - 1 : 0;
 
@@ -50,7 +52,7 @@ namespace Booker.Controllers
         public async Task<IActionResult> FindById(string id)
         {
             if (string.IsNullOrEmpty(id))
-                return BadRequest(new { message = "Invalid id" });
+                return BadRequest(new { title = "Invalid id" });
 
             try
             {
@@ -64,7 +66,7 @@ namespace Booker.Controllers
             }
             catch (FormatException)
             {
-                return BadRequest(new { message = "The given id was not valid" });
+                return BadRequest(new { title = "The given id was not valid" });
             }
         }
 
@@ -90,23 +92,17 @@ namespace Booker.Controllers
         [HttpPost]
         public async Task<IActionResult> Add([FromForm] Book book)
         {
-            Book? createdBook;
+            // Author will never be null
+            Author? author = await _authorService.FindById((Guid)book.AuthorId!);
 
-            try
-            {
-                // TODO: IMPLEMENT AUTO BOOK NAMER
-                createdBook = await _bookService.Add(book);
-                return Created(nameof(book), createdBook);
-            }
-            catch (DbUpdateException ex)
-            {
-                return BadRequest(
-                    new
-                    {
-                        message = "Book ISBN already exists ",
-                        error = ex.Message,
-                    });
-            }
+            if (author is null) return NotFound(new { title = "Author was not found" });
+
+            Publisher? publisher = await _publisherService.FindById((Guid)book.PublisherId!);
+
+            if (publisher is null) return NotFound(new { title = "Publisher was not found" });
+
+            Book createdBook = await _bookService.Add(book);
+            return Created(nameof(book), createdBook);
         }
 
         [HttpDelete("{id}")]
@@ -116,34 +112,68 @@ namespace Booker.Controllers
             {
                 Guid stringToGuid = Guid.Parse(id);
 
-                Book? deletedBook = await _bookService.Delete(stringToGuid);
+                Book? bookToDelete = await _bookService.FindById(stringToGuid);
 
-                if (deletedBook is null)
-                    return NotFound(new { message = "Id not found" });
+                if (bookToDelete is null)
+                    return NotFound(new { title = "Id not found" });
+
+                Book deletedBook = await _bookService.Delete(bookToDelete);
 
                 return Ok(deletedBook);
             }
             catch (FormatException)
             {
-                return BadRequest(new { message = "The given id was not valid" });
+                return BadRequest(new { title = "The given id was not valid" });
             }
         }
 
         [HttpPut("associations/{bookId}/genre/{genreId}")]
-        public async Task<IActionResult> AssociateGenre([FromForm] Guid bookId, [FromForm] Guid genreId)
+        public async Task<IActionResult> AssociateGenre(
+            [FromForm] Guid bookId,
+            [FromForm] Guid genreId
+        )
         {
             Genre? genreToRelate = await _genreService.FindById(genreId);
 
             if (genreToRelate is null)
-                return NotFound(new { message = "Genre not found" });
+                return NotFound(new { title = "Genre not found" });
 
-            await
+            Book? bookToRelate = await _bookService.FindById(bookId);
+
+            if (bookToRelate is null)
+                return NotFound(new { title = "Book not found" });
+
+            if (bookToRelate.Genres is null)
+                bookToRelate.Genres = new List<Genre> { genreToRelate };
+
+            bookToRelate.Genres.Add(genreToRelate);
+
+            await _bookService.Update(bookToRelate);
+
+            return Ok(bookToRelate);
         }
 
-        [HttpPut("associations/author")]
-        public async Task<IActionResult> AssociateAuthor()
+        [HttpPut("associations/{bookId}/author/{authorId}")]
+        public async Task<IActionResult> AssociateAuthor(
+            [FromForm] Guid bookId,
+            [FromForm] Guid authorId
+        )
         {
+            Author? authorToRelate = await _authorService.FindById(authorId);
 
+            if (authorToRelate is null)
+                return NotFound(new { title = "Author not found" });
+
+            Book? bookToRelate = await _bookService.FindById(bookId);
+
+            if (bookToRelate is null)
+                return NotFound(new { title = "Book not found" });
+
+            bookToRelate.Author = authorToRelate;
+
+            await _bookService.Update(bookToRelate);
+
+            return Ok(bookToRelate);
         }
     }
 }
