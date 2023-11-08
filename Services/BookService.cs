@@ -1,10 +1,9 @@
 using Booker.Models;
 using Booker.Repositories.Models;
-using Booker.Services.Models;
 
-namespace Booker.Services.Implementations
+namespace Booker.Services
 {
-    public class BookService : IBookService
+    public class BookService
     {
         private readonly IBookRepository _bookRepository;
 

@@ -1,10 +1,9 @@
 using Booker.Models;
 using Booker.Repositories.Models;
-using Booker.Services.Models;
 
-namespace Booker.Services.Implementations
+namespace Booker.Services
 {
-    public class GenreService : IGenreService
+    public class GenreService
     {
         private readonly IGenreRepository _genreRepository;
 
