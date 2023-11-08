@@ -5,6 +5,7 @@ namespace Booker.Models
     public class Author
     {
         public Guid Id { get; set; }
+        [Required]
         [StringLength(30)]
         public string? FirstName { get; set; }
         [StringLength(30)]
