@@ -143,8 +143,7 @@ namespace Booker.Controllers
             if (bookToRelate is null)
                 return NotFound(new { title = "Book not found" });
 
-            if (bookToRelate.Genres is null)
-                bookToRelate.Genres = new List<Genre> { genreToRelate };
+            bookToRelate.Genres ??= new List<Genre> { genreToRelate };
 
             bookToRelate.Genres.Add(genreToRelate);
 
@@ -169,7 +168,7 @@ namespace Booker.Controllers
             if (bookToRelate is null)
                 return NotFound(new { title = "Book not found" });
 
-            bookToRelate.Author = authorToRelate;
+            bookToRelate.AuthorId = authorToRelate.Id;
 
             await _bookService.Update(bookToRelate);
 

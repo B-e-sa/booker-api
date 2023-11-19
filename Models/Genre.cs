@@ -7,6 +7,11 @@ namespace Booker.Models
     public class Genre
     {
         public Guid? Id { get; set; }
+
+        public List<Genre> Genres { get; } = new();
+        
+        public List<Author> Authors { get; } = new();
+ 
         [StringLength(30)]
         public string? Name { get; set; }
     }

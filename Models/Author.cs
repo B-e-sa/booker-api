@@ -6,15 +6,17 @@ namespace Booker.Models
     {
         public Guid Id { get; set; }
 
+        public List<Book> Books { get; } = new();
+
+        public List<Genre> Genres { get; set; } = new();
+
         [Required]
-        [StringLength(30)]
+        [StringLength(15)]
         public string? FirstName { get; set; }
 
-        [StringLength(30)]
+        [StringLength(15)]
         public string? LastName { get; set; }
 
-        public ICollection<Genre>? Genres { get; set; }
-        
-        public ICollection<Book>? Books { get; set; }
+        public int? Note { get; set; }
     }
 }

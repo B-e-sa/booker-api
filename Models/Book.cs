@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace Booker.Models
@@ -8,11 +9,15 @@ namespace Booker.Models
     {
         public Guid? Id { get; set; }
 
-        [Required]
-        public Guid? AuthorId { get; set; }
-
-        [Required]
+        [ForeignKey("Publisher")]
         public Guid? PublisherId { get; set; }
+        public Publisher Publiser { get; } = null!;
+
+        [ForeignKey("Author")]
+        public Guid? AuthorId { get; set; }
+        public Author Author { get; } = null!;
+
+        public List<Genre> Genres { get; set; } = new();
 
         [Required]
         [StringLength(30)]
@@ -27,11 +32,6 @@ namespace Booker.Models
         )]
         public string? ISBN { get; set; }
 
-        public Author? Author { get; set; }
-
-        public Publisher? Publisher { get; set; }
-
-        [Required]
-        public ICollection<Genre>? Genres { get; set; }
+        public int? Note { get; set; }
     }
 }
