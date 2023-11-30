@@ -1,9 +1,12 @@
 using Booker.Models;
 using Booker.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Movies.Api.Identity;
 
 namespace Booker.Controllers
 {
+    [Authorize(Policy=IdentityData.AdminUserPolicyName)]
     [Route("[controller]")]
     [ApiController]
     class GenreController : ControllerBase
@@ -12,6 +15,7 @@ namespace Booker.Controllers
 
         public GenreController(GenreService genreService) => _genreService = genreService;
 
+        [AllowAnonymous]
         public async Task<IActionResult> FindAll(
             [FromQuery] int limit = 30,
             [FromQuery] int offset = 0
@@ -33,6 +37,7 @@ namespace Booker.Controllers
                 });
         }
 
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<IActionResult> FindById(string id)
         {

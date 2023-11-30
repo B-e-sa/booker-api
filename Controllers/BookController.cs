@@ -1,9 +1,12 @@
 using Booker.Models;
 using Booker.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Movies.Api.Identity;
 
 namespace Booker.Controllers
 {
+    [Authorize(Policy=IdentityData.AdminUserPolicyName)]
     [Route("[controller]")]
     [ApiController]
     public class BookController : ControllerBase
@@ -26,6 +29,7 @@ namespace Booker.Controllers
             _publisherService = publisherService;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> FindAll(
             [FromQuery] int limit = 30,
@@ -48,6 +52,7 @@ namespace Booker.Controllers
                 });
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> FindById(string id)
         {
@@ -70,24 +75,6 @@ namespace Booker.Controllers
             }
         }
 
-        /* TODO: IMPLEMENT ROUTE METHOD
-        [HttpPost("pdf")]
-        public IActionResult UploadPdf()
-        {
-            try
-            {
-                var contentDisposition = ContentDispositionHeaderValue.Parse(Request.Headers["Content-Disposition"]);
-
-                Console.Write(contentDisposition);
-
-                return Ok("Arquivo PDF foi recebido e o conteúdo foi e1ibido no console.");
-            }
-            catch (E1ception e1)
-            {
-                return BadRequest($"Erro ao receber o arquivo PDF: {e1.Message}");
-            }
-        }
-        */
 
         [HttpPost]
         public async Task<IActionResult> Add([FromForm] Book book)

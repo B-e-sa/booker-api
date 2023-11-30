@@ -1,10 +1,12 @@
 using Booker.Models;
 using Booker.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
+using Movies.Api.Identity;
 
 namespace Booker.Controllers
 {
+    [Authorize(Policy=IdentityData.AdminUserPolicyName)]
     [Route("[controller]")]
     [ApiController]
     class PublisherController : ControllerBase
@@ -31,6 +33,7 @@ namespace Booker.Controllers
             return Created(nameof(publisher), createdPublisher);
         }
 
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<IActionResult> FindById(string id)
         {
@@ -58,6 +61,7 @@ namespace Booker.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> FindAll(
             [FromQuery] int limit = 30,
@@ -134,8 +138,7 @@ namespace Booker.Controllers
             if (bookToRelate is null)
                 return NotFound(new { title = "Book not found" });
 
-            if (publisherToRelate.Books is null)
-                publisherToRelate.Books = new List<Book> { bookToRelate };
+            publisherToRelate.Books ??= new List<Book> { bookToRelate };
 
             publisherToRelate.Books.Add(bookToRelate);
 
@@ -160,7 +163,7 @@ namespace Booker.Controllers
             if (bookToRelate is null)
                 return NotFound(new { title = "Book not found" });
 
-            bookToRelate.Author = authorToRelate;
+            bookToRelate.AuthorId = authorToRelate.Id;
 
             await _bookService.Update(bookToRelate);
 
