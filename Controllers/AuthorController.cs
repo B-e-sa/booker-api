@@ -1,12 +1,13 @@
+using Booker.Identity;
 using Booker.Models;
 using Booker.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Movies.Api.Identity;
 
 namespace Booker.Controllers
 {
-    [Authorize(Policy=IdentityData.AdminUserPolicyName)]
+    [Authorize]
+    [RequiresClaim(IdentityData.AdminUserClaimName, "true")]
     [Route("[controller]")]
     [ApiController]
     public class AuthorController : ControllerBase
@@ -85,9 +86,14 @@ namespace Booker.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id)
+        public async Task<IActionResult> Update([FromForm] Author author)
         {
-            Author? authorToUpdate = await _authorService.FindById(id);
+            if(author is null)
+            {
+                return BadRequest("Invalid author input");
+            }
+
+            Author? authorToUpdate = await _authorService.FindById(author.Id);
 
             if (authorToUpdate is null) return NotFound();
 

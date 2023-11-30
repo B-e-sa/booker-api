@@ -1,12 +1,13 @@
+using Booker.Identity;
 using Booker.Models;
 using Booker.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Movies.Api.Identity;
 
 namespace Booker.Controllers
 {
-    [Authorize(Policy=IdentityData.AdminUserPolicyName)]
+    [Authorize]
+    [RequiresClaim(IdentityData.AdminUserClaimName, "true")]
     [Route("[controller]")]
     [ApiController]
     class GenreController : ControllerBase

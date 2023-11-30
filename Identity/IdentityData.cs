@@ -1,4 +1,4 @@
-namespace Movies.Api.Identity;
+namespace Booker.Identity;
 
 public class IdentityData 
 {
